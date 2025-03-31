@@ -21,6 +21,7 @@ PROJECT STRUCTURE:
 │   ├── /api - API routes and handlers
 │   ├── /components - React components
 │   ├── /lib - utilities, hooks, contexts
+│   ├── /test - test scripts to test functionality
 │   └── /(routes) - grouped routes
 /docs
 ├── README.md - Project overview, setup, usage
@@ -28,6 +29,8 @@ PROJECT STRUCTURE:
 ├── STRUCTURE.md - Architecture, organization
 ├── API.md - API documentation
 └── COMPONENTS.md - Component library docs
+/scripts
+└── kill-port.js - Development environment management
 
 ARCHITECTURAL DECISIONS & STANDARDS:
 
@@ -74,7 +77,38 @@ ARCHITECTURAL DECISIONS & STANDARDS:
 - Error handling
 - Progress indicators
 
-7. Documentation Requirements
+7. Development Environment Management
+Process Control:
+- Kill existing processes before starting new ones:
+  ```bash
+  # Windows
+  taskkill /F /IM "node.exe" /FI "WINDOWTITLE eq npm*"
+  
+  # Unix-based
+  lsof -ti :3000 | xargs kill -9
+  ```
+- Clear ports (3000 for Next.js, others as needed)
+- Remove build artifacts before new builds
+
+Environment Scripts (package.json):
+```json
+{
+  "scripts": {
+    "dev:clean": "npm run kill:port && npm run dev",
+    "kill:port": "node scripts/kill-port.js",
+    "dev": "next dev",
+    "build:clean": "rm -rf .next && next build"
+  }
+}
+```
+
+Environment Cleanup:
+- Clear .next directory between branches
+- Reset local database if applicable
+- Clear cache when needed
+- Remove temporary files
+
+8. Documentation Requirements
 Code Documentation:
 - JSDoc comments for all functions/components
 - Inline comments explaining complex logic
@@ -89,7 +123,7 @@ Documentation Updates:
 - Document breaking changes
 - Include migration guides when needed
 
-8. Coding Standards
+9. Coding Standards
 File Organization:
 - kebab-case for files
 - PascalCase for components
@@ -104,6 +138,40 @@ Code Quality:
 - No duplicate code
 - Clean code principles
 
+10. Test Script Generation
+Test Coverage:
+- Generate test scripts for all new functionality
+- Update existing tests when modifying code
+- Maintain minimum 80% test coverage
+- Include both unit and integration tests
+
+Test Organization:
+- Place tests in /app/test directory
+- Name test files with *.test.ts(x) suffix
+- Group tests by feature/component
+- Follow AAA pattern (Arrange, Act, Assert)
+
+Test Requirements:
+- Unit tests for all utility functions
+- Component tests for UI elements
+- Integration tests for API endpoints
+- E2E tests for critical user flows
+- Mock external dependencies
+
+Test Tools:
+- Jest for unit/integration testing
+- React Testing Library for components
+- Cypress/Playwright for E2E testing
+- MSW for API mocking
+- Test-utils for common test helpers
+
+Automated Testing:
+- Run tests before each commit
+- Generate test coverage reports
+- Fail builds on test failures
+- Update test documentation
+- Include test examples in component docs
+
 When Providing Solutions:
 1. Use server components by default
 2. Implement proper error handling
@@ -117,6 +185,9 @@ When Providing Solutions:
 10. Add inline code comments
 11. Consider performance implications
 12. Include test cases
+13. Ensure clean development environment
+14. Include process management commands
+15. Add cleanup scripts when needed
 
 Follow Official Documentation:
 - Next.js App Router
